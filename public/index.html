@@ -1,0 +1,108 @@
+<!DOCTYPE html>  
+<html lang="en">  
+<head>  
+  <meta charset="UTF-8">  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+  <title>Resume Review Project</title>  
+  <style>  
+   body {  
+    font-family: Arial, sans-serif;  
+    margin: 20px;  
+    background-color: #ffffff;
+   }  
+   h1 {  
+    text-align: center;  
+    color: #34C759; 
+   }  
+   p {  
+    text-align: center;
+    max-width: 600px; 
+    margin: 0 auto;
+    padding: 10px; 
+   }  
+   form {  
+    max-width: 500px;  
+    margin: 20px auto;  
+    padding: 20px;  
+    border: 1px solid #ccc;  
+    border-radius: 10px;  
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);  
+   }  
+   input[type="file"], input[type="submit"] {  
+    display: block;  
+    margin: 20px 0;  
+   }  
+   button[type="submit"] {  
+    background-color: #34C759; 
+    color: #ffffff;  
+    padding: 10px 20px;  
+    border: none;  
+    border-radius: 5px;  
+    cursor: pointer;  
+   }  
+   button[type="submit"]:hover {  
+    background-color: #2ecc71; 
+   }  
+   #output {  
+    margin-top: 20px;  
+    padding: 20px;  
+    border: 1px solid #ccc;  
+    border-radius: 10px;  
+    background-color: #f9f9f9;
+   } 
+   h3{
+    text-align: center;  
+    color: #34C759;
+   } 
+   strong {
+    color: #34C759;
+   }
+  </style>  
+</head>  
+<body>  
+  <h1>Resume Review</h1>  
+  <p>After the upload, check the generated response for accuracy percentage and how well your CV is tailored for that job. It is advisable to check the missing keywords and add them to your resume to increase your accuracy and chances of getting selected for the job.</p>  
+  <form id="uploadForm" enctype="multipart/form-data"> 
+   <label>Resume:</label> 
+   <input type="file" name="resume" id="resume" />
+   <label>Job Discription</label>  
+   <input type="file" name="jobDescription" id="jobDescription" />  
+   <button type="submit">Upload</button>  
+  </form>  
+   
+  <div id="output"></div>  
+   
+  <script>  
+   document.getElementById("uploadForm").onsubmit = async function (e) {  
+    e.preventDefault();  
+    const formData = new FormData();  
+    formData.append("resume", document.getElementById("resume").files[0]);  
+    formData.append("jobDescription", document.getElementById("jobDescription").files[0]);  
+    try {  
+      const response = await fetch('http://localhost:5000/upload', {  
+       method: 'POST',  
+       body: formData  
+      });  
+      const data = await response.json();  
+      if (response.ok) {  
+       document.getElementById("output").innerHTML = `  
+        <h3>Files uploaded and processed successfully!</h3>  
+        <p><strong>Resume Keywords:</strong> ${data.resumeKeywords.join(', ')}</p>  
+        <p><strong>Job Description Keywords:</strong> ${data.jobDescKeywords.join(', ')}</p>  
+        <p><strong>Matched Keywords:</strong> ${data.feedback.matchedKeywords.join(', ')}</p>  
+        <p><strong>Missing Keywords:</strong> ${data.feedback.missingKeywords.join(', ')}</p>  
+        <p><strong>Match Percentage:</strong> ${data.feedback.matchPercentage.toFixed(2)}%</p>  
+       `;  
+      } else {  
+       document.getElementById("output").innerHTML = `  
+        <h3>Error occurred:</h3>  
+        <p>${data.message}</p>  
+       `;  
+      }  
+    } catch (error) {  
+      document.getElementById("output").innerHTML = `<h3>Error occurred: ${error.message}</h3>`;  
+    }  
+   };  
+  </script>  
+</body>  
+</html>
